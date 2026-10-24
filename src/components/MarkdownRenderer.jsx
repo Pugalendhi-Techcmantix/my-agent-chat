@@ -5,16 +5,13 @@ import { Copy, Check } from 'lucide-react';
 
 /**
  * Standard Markdown Renderer using `react-markdown` and `remark-gfm`.
- * Fully standards-compliant:
- * - Automatically parses GFM tables, strikethroughs, checklists
- * - Code blocks with language badge & copy-to-clipboard button
- * - Clean Tailwind typography for headings, lists, blockquotes, links
+ * Fully standards-compliant with dark mode support.
  */
 export default function MarkdownRenderer({ content = '' }) {
   if (!content) return null;
 
   return (
-    <div className="text-slate-800 text-[14.5px] leading-relaxed wrap-break-word space-y-3">
+    <div className="text-slate-800 dark:text-slate-100 text-[14.5px] leading-relaxed wrap-break-word space-y-3">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -39,7 +36,7 @@ export default function MarkdownRenderer({ content = '' }) {
 
             return (
               <code
-                className="px-1.5 py-0.5 mx-0.5 rounded-md bg-slate-100 text-slate-800 text-[12.5px] border border-slate-200/80 font-mono font-medium"
+                className="px-1.5 py-0.5 mx-0.5 rounded-md bg-slate-100 dark:bg-[#2c2c2c] text-slate-800 dark:text-slate-200 text-[12.5px] border border-slate-200/80 dark:border-[#3a3a3a] font-mono font-medium"
                 {...props}
               >
                 {children}
@@ -47,10 +44,10 @@ export default function MarkdownRenderer({ content = '' }) {
             );
           },
 
-          // Standard GFM Tables
+          // Standard GFM Tables with Dark Mode
           table({ children }) {
             return (
-              <div className="my-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-2xs">
+              <div className="my-4 overflow-x-auto rounded-xl border border-slate-200 dark:border-[#333] bg-white dark:bg-[#1a1a1a] shadow-2xs">
                 <table className="w-full text-left text-[13.5px] border-collapse">
                   {children}
                 </table>
@@ -59,21 +56,21 @@ export default function MarkdownRenderer({ content = '' }) {
           },
           thead({ children }) {
             return (
-              <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-700 font-semibold text-xs tracking-wider">
+              <thead className="bg-slate-50/90 dark:bg-[#242424] border-b border-slate-200 dark:border-[#333] text-slate-700 dark:text-slate-200 font-semibold text-xs tracking-wider">
                 {children}
               </thead>
             );
           },
           tbody({ children }) {
             return (
-              <tbody className="divide-y divide-slate-100 bg-white text-slate-700">
+              <tbody className="divide-y divide-slate-100 dark:divide-[#282828] bg-white dark:bg-[#1a1a1a] text-slate-700 dark:text-slate-300">
                 {children}
               </tbody>
             );
           },
           tr({ children }) {
             return (
-              <tr className="hover:bg-slate-50/70 transition-colors">
+              <tr className="hover:bg-slate-50/70 dark:hover:bg-[#222222] transition-colors">
                 {children}
               </tr>
             );
@@ -82,7 +79,7 @@ export default function MarkdownRenderer({ content = '' }) {
             return (
               <th
                 style={style}
-                className="px-3.5 py-2.5 border-r border-slate-200/60 last:border-r-0"
+                className="px-3.5 py-2.5 border-r border-slate-200/60 dark:border-[#2e2e2e] last:border-r-0"
               >
                 {children}
               </th>
@@ -92,7 +89,7 @@ export default function MarkdownRenderer({ content = '' }) {
             return (
               <td
                 style={style}
-                className="px-3.5 py-2 border-r border-slate-100 last:border-r-0 align-top"
+                className="px-3.5 py-2 border-r border-slate-100 dark:border-[#2e2e2e] last:border-r-0 align-top"
               >
                 {children}
               </td>
@@ -102,28 +99,28 @@ export default function MarkdownRenderer({ content = '' }) {
           // Headings
           h1({ children }) {
             return (
-              <h1 className="text-xl font-bold text-slate-900 mt-5 mb-2.5 border-b border-slate-200 pb-1.5">
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-5 mb-2.5 border-b border-slate-200 dark:border-[#2f2f2f] pb-1.5">
                 {children}
               </h1>
             );
           },
           h2({ children }) {
             return (
-              <h2 className="text-lg font-bold text-slate-900 mt-4 mb-2 border-b border-slate-100 pb-1">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mt-4 mb-2 border-b border-slate-100 dark:border-[#2f2f2f] pb-1">
                 {children}
               </h2>
             );
           },
           h3({ children }) {
             return (
-              <h3 className="text-base font-bold text-slate-900 mt-3.5 mb-1.5">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white mt-3.5 mb-1.5">
                 {children}
               </h3>
             );
           },
           h4({ children }) {
             return (
-              <h4 className="text-sm font-bold text-slate-800 mt-3 mb-1 uppercase tracking-wide">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-3 mb-1 uppercase tracking-wide">
                 {children}
               </h4>
             );
@@ -156,7 +153,7 @@ export default function MarkdownRenderer({ content = '' }) {
           // Blockquote
           blockquote({ children }) {
             return (
-              <blockquote className="border-l-4 border-indigo-400 bg-indigo-50/50 pl-3.5 py-2 my-2.5 italic text-slate-700 rounded-r">
+              <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 pl-3.5 py-2 my-2.5 italic text-slate-700 dark:text-slate-300 rounded-r">
                 {children}
               </blockquote>
             );
@@ -169,7 +166,7 @@ export default function MarkdownRenderer({ content = '' }) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-indigo-600 hover:text-indigo-700 underline font-medium hover:underline-offset-2 transition-colors"
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline font-medium hover:underline-offset-2 transition-colors"
               >
                 {children}
               </a>
@@ -178,7 +175,7 @@ export default function MarkdownRenderer({ content = '' }) {
 
           // Horizontal rule
           hr() {
-            return <hr className="my-4 border-t border-slate-200/80" />;
+            return <hr className="my-4 border-t border-slate-200/80 dark:border-[#2f2f2f]" />;
           },
         }}
       >

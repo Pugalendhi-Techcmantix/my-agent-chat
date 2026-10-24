@@ -49,9 +49,9 @@ export default function ChatInput({ onSendMessage, onStop, isLoading, placeholde
           <button
             onClick={onStop}
             type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200/90 hover:bg-slate-50 text-slate-700 text-xs font-medium shadow-xs transition-all cursor-pointer hover:border-slate-300"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#282828] border border-slate-200/90 dark:border-[#3a3a3a] hover:bg-slate-50 dark:hover:bg-[#333333] text-slate-700 dark:text-slate-200 text-xs font-medium shadow-xs transition-all cursor-pointer hover:border-slate-300 dark:hover:border-[#4a4a4a]"
           >
-            <Square className="w-3 h-3 fill-slate-700 text-slate-700" />
+            <Square className="w-3 h-3 fill-slate-700 dark:fill-slate-200 text-slate-700 dark:text-slate-200" />
             <span>Stop generating</span>
           </button>
         </div>
@@ -59,14 +59,14 @@ export default function ChatInput({ onSendMessage, onStop, isLoading, placeholde
 
       <form
         onSubmit={handleSubmit}
-        className="relative bg-white border border-slate-200/90 rounded-3xl shadow-sm hover:shadow-md focus-within:shadow-md focus-within:border-slate-300 transition-all duration-200"
+        className="relative bg-white dark:bg-[#2f2f2f] border border-slate-200/90 dark:border-[#3a3a3a] rounded-3xl shadow-sm hover:shadow-md focus-within:shadow-md focus-within:border-slate-300 dark:focus-within:border-[#4a4a4a] transition-all duration-200"
       >
         <div className="flex items-end px-3 py-2 gap-2">
           {/* Attachment Icon Placeholder */}
           <div className="relative group mb-0.5">
             <button
               type="button"
-              className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-[#383838] transition-colors cursor-pointer"
               title="Attach file (coming soon)"
               aria-label="Attach file"
               disabled={isLoading}
@@ -87,7 +87,7 @@ export default function ChatInput({ onSendMessage, onStop, isLoading, placeholde
             disabled={isLoading}
             placeholder={placeholder || 'Ask anything or paste text...'}
             rows={1}
-            className="flex-1 max-h-45 py-2 px-1 text-slate-900 placeholder-slate-400 bg-transparent resize-none focus:outline-hidden text-[14.5px] leading-relaxed disabled:opacity-60"
+            className="flex-1 max-h-45 py-2 px-1 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 bg-transparent resize-none focus:outline-hidden text-[14.5px] leading-relaxed disabled:opacity-60"
           />
 
           {/* Action Button: Send or Stop */}
@@ -95,11 +95,11 @@ export default function ChatInput({ onSendMessage, onStop, isLoading, placeholde
             <button
               onClick={onStop}
               type="button"
-              className="w-8 h-8 rounded-full mb-1 bg-slate-900 hover:bg-slate-800 text-white transition-all flex items-center justify-center shrink-0 shadow-2xs cursor-pointer active:scale-95"
+              className="w-8 h-8 rounded-full mb-1 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 transition-all flex items-center justify-center shrink-0 shadow-2xs cursor-pointer active:scale-95"
               title="Stop generating"
               aria-label="Stop generating"
             >
-              <Square className="w-3 h-3 fill-white" />
+              <Square className="w-3 h-3 fill-white dark:fill-slate-900" />
             </button>
           ) : (
             <button
@@ -107,8 +107,8 @@ export default function ChatInput({ onSendMessage, onStop, isLoading, placeholde
               disabled={!input.trim()}
               className={`w-8 h-8 rounded-full mb-1 transition-all duration-200 flex items-center justify-center shrink-0 ${
                 input.trim()
-                  ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-2xs cursor-pointer active:scale-95'
-                  : 'bg-slate-150 text-slate-300 cursor-not-allowed'
+                  ? 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 shadow-2xs cursor-pointer active:scale-95'
+                  : 'bg-slate-150 dark:bg-[#383838] text-slate-300 dark:text-slate-600 cursor-not-allowed'
               }`}
               title="Send message (Enter)"
               aria-label="Send message"
@@ -120,7 +120,7 @@ export default function ChatInput({ onSendMessage, onStop, isLoading, placeholde
       </form>
 
       {/* Footer Disclaimer */}
-      <div className="flex items-center justify-center gap-1.5 mt-2 text-[11.5px] text-slate-400">
+      <div className="flex items-center justify-center gap-1.5 mt-2 text-[11.5px] text-slate-400 dark:text-slate-500">
         <span>Powered by custom n8n workflow. Press Enter to send.</span>
       </div>
     </div>
