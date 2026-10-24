@@ -171,7 +171,7 @@ export default function Sidebar({
                   AgentIQ
                 </div>
                 <div className="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                  <span>n8n Assistant</span>
+                  <span>AI Assistant</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 </div>
               </div>
