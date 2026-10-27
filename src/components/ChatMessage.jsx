@@ -1,7 +1,24 @@
 import { useState } from 'react';
-import { Bot, Copy, Check, RotateCcw, AlertCircle } from 'lucide-react';
+import { Bot, Copy, Check, RotateCcw, AlertCircle, Paperclip, FileText, Image, FileCode, FileAudio, FileVideo, File } from 'lucide-react';
 import MarkdownRenderer from './MarkdownRenderer';
 import { formatTime } from '../utils/helpers';
+
+/** Returns the right icon for an attachment MIME type */
+function AttachmentIcon({ type, className }) {
+  if (!type) return <File className={className} />;
+  if (type.startsWith('image/')) return <Image className={className} />;
+  if (type.startsWith('audio/')) return <FileAudio className={className} />;
+  if (type.startsWith('video/')) return <FileVideo className={className} />;
+  if (type.includes('pdf') || type.includes('word') || type.includes('text')) return <FileText className={className} />;
+  if (type.includes('javascript') || type.includes('json') || type.includes('xml') || type.includes('html') || type.includes('css')) return <FileCode className={className} />;
+  return <File className={className} />;
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export default function ChatMessage({ message, onRetry }) {
   const [copied, setCopied] = useState(false);
@@ -21,13 +38,34 @@ export default function ChatMessage({ message, onRetry }) {
   if (isUser) {
     return (
       <div className="group w-full max-w-3xl mx-auto px-4 sm:px-6 py-2 flex justify-end animate-fade-in">
-        <div className="flex flex-col items-end max-w-[85%] sm:max-w-[72%]">
-          {/* User Bubble */}
-          <div className="bg-slate-100 dark:bg-[#2f2f2f] hover:bg-slate-200/70 dark:hover:bg-[#383838] text-slate-900 dark:text-slate-100 rounded-3xl rounded-br-md px-5 py-3 text-[15px] leading-relaxed shadow-2xs whitespace-pre-wrap wrap-break-word border border-slate-200/60 dark:border-[#3a3a3a] transition-colors">
-            {message.content}
-          </div>
+        <div className="flex flex-col items-end max-w-[85%] sm:max-w-[72%] gap-1.5">
+          {/* Attachment badge (shown above the text bubble) */}
+          {message.attachment && (
+            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-[#383838] border border-slate-200 dark:border-[#4a4a4a] rounded-xl px-3 py-2 self-end">
+              <div className="w-7 h-7 rounded-md bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center shrink-0">
+                <AttachmentIcon type={message.attachment.type} className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200 truncate max-w-40">
+                  {message.attachment.name}
+                </p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                  <Paperclip className="w-2.5 h-2.5" />
+                  {formatBytes(message.attachment.size)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* User text bubble (only when there is actual text beyond the file-only sentinel) */}
+          {message.content && !message.content.startsWith('📎 ') && (
+            <div className="bg-slate-100 dark:bg-[#2f2f2f] hover:bg-slate-200/70 dark:hover:bg-[#383838] text-slate-900 dark:text-slate-100 rounded-3xl rounded-br-md px-5 py-3 text-[15px] leading-relaxed shadow-2xs whitespace-pre-wrap wrap-break-word border border-slate-200/60 dark:border-[#3a3a3a] transition-colors">
+              {message.content}
+            </div>
+          )}
+
           {/* Timestamp */}
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {formatTime(message.timestamp)}
           </span>
         </div>

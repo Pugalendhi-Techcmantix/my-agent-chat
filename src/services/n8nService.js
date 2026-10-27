@@ -117,10 +117,11 @@ export function extractTextFromResponse(data) {
  * @param {string} params.message - The text message sent by the user
  * @param {string} params.sessionId - Unique chat session ID for n8n memory nodes
  * @param {Array} [params.history] - Optional chat history context
+ * @param {File|null} [params.attachment] - Optional file attachment
  * @param {AbortSignal} [params.signal] - Optional abort signal
  * @returns {Promise<string>} The assistant's response text
  */
-export async function sendMessageToN8n({ message, sessionId, history = [], signal }) {
+export async function sendMessageToN8n({ message, sessionId, history = [], attachment = null, signal }) {
   const webhookUrl = getWebhookUrl();
 
   if (!webhookUrl || !webhookUrl.trim()) {
@@ -139,25 +140,59 @@ export async function sendMessageToN8n({ message, sessionId, history = [], signa
     );
   }
 
-  // Construct standard n8n chat payload
-  // Both `chatInput` and `message` are included for maximum compatibility
-  // with n8n's Chat Trigger and Webhook nodes
-  const payload = {
-    message: message.trim(),
-    chatInput: message.trim(),
-    sessionId: sessionId || 'default_session',
-    history: Array.isArray(history)
-      ? history.map((h) => ({ role: h.role, content: h.content }))
-      : [],
-    timestamp: new Date().toISOString(),
-  };
+  let requestData;
+  let requestHeaders;
+
+  if (attachment) {
+    // ── Multipart/form-data when a file is attached ──
+    // Field layout:
+    //   message      → text
+    //   chatInput    → text  (alias for n8n Chat Trigger compatibility)
+    //   sessionId    → text
+    //   timestamp    → text
+    //   history      → JSON string
+    //   data         → binary file (the attachment itself)
+    const form = new FormData();
+    form.append('message', message.trim());
+    form.append('chatInput', message.trim());
+    form.append('sessionId', sessionId || 'default_session');
+    form.append('timestamp', new Date().toISOString());
+    form.append(
+      'history',
+      JSON.stringify(
+        Array.isArray(history)
+          ? history.map((h) => ({ role: h.role, content: h.content }))
+          : []
+      )
+    );
+    // Binary file under the field name "data"
+    form.append('data', attachment, attachment.name);
+
+    requestData = form;
+    // Let axios set Content-Type with the correct multipart boundary automatically
+    requestHeaders = {
+      Accept: 'application/json, text/plain, */*',
+    };
+  } else {
+    // ── JSON when no file is attached ──
+    requestData = {
+      message: message.trim(),
+      chatInput: message.trim(),
+      sessionId: sessionId || 'default_session',
+      history: Array.isArray(history)
+        ? history.map((h) => ({ role: h.role, content: h.content }))
+        : [],
+      timestamp: new Date().toISOString(),
+    };
+    requestHeaders = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json, text/plain, */*',
+    };
+  }
 
   try {
-    const response = await axios.post(parsedUrl.toString(), payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json, text/plain, */*',
-      },
+    const response = await axios.post(parsedUrl.toString(), requestData, {
+      headers: requestHeaders,
       signal,
     });
 

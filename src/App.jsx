@@ -142,7 +142,7 @@ export default function App() {
         {/* Scrollable Conversation Container */}
         <main className="flex-1 overflow-y-auto flex flex-col">
           {!hasMessages ? (
-            <WelcomeScreen onSelectPrompt={(prompt) => sendMessage(prompt)} />
+            <WelcomeScreen onSelectPrompt={(prompt) => sendMessage(prompt, null)} />
           ) : (
             <div className="py-4 space-y-2">
               {messages.map((message) => (
@@ -164,7 +164,7 @@ export default function App() {
         {/* Fixed Message Composer at Bottom */}
         <footer className="shrink-0 bg-linear-to-t from-white via-white/95 to-transparent dark:from-[#212121] dark:via-[#212121]/95 dark:to-transparent pt-2 transition-colors duration-200">
           <ChatInput
-            onSendMessage={sendMessage}
+            onSendMessage={(text, file) => sendMessage(text, file)}
             onStop={stopGenerating}
             isLoading={isLoading}
             placeholder={

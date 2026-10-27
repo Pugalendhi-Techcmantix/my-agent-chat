@@ -167,16 +167,23 @@ export function useChat() {
 
   // Send a message
   const handleSendMessage = useCallback(
-    async (text) => {
+    async (text, attachment = null) => {
       const trimmed = text.trim();
-      if (!trimmed || isLoading) return;
+      if ((!trimmed && !attachment) || isLoading) return;
+
+      // Build display label: if only a file, use the filename
+      const displayContent = trimmed || (attachment ? `📎 ${attachment.name}` : '');
 
       const userMessage = {
         id: generateId('msg_user'),
         role: 'user',
-        content: trimmed,
+        content: displayContent,
         timestamp: Date.now(),
         status: 'success',
+        // Store attachment meta for display (not the raw binary)
+        attachment: attachment
+          ? { name: attachment.name, size: attachment.size, type: attachment.type }
+          : null,
       };
 
       // Add user message & optionally update conversation title
@@ -184,7 +191,7 @@ export function useChat() {
         prev.map((chat) => {
           if (chat.id === activeChatId) {
             const isFirstMessage = chat.messages.length === 0;
-            const newTitle = isFirstMessage ? truncate(trimmed, 30) : chat.title;
+            const newTitle = isFirstMessage ? truncate(displayContent, 30) : chat.title;
             return {
               ...chat,
               title: newTitle,
@@ -217,9 +224,10 @@ export function useChat() {
 
       try {
         const reply = await sendMessageToN8n({
-          message: trimmed,
+          message: trimmed || (attachment ? attachment.name : ''),
           sessionId: activeChatId,
           history: activeConversation.messages,
+          attachment,
           signal: abortControllerRef.current.signal,
         });
 
