@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   ArrowUp,
+  ArrowDown,
   Paperclip,
   Square,
   X,
@@ -77,25 +78,47 @@ export default function ChatInput({
     textarea.style.height = `${Math.max(newHeight, 44)}px`;
   }, [input]);
 
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
+
     if (isLoading) {
-      if (onStop) onStop();
+      onStop?.();
       return;
     }
 
     const trimmed = input.trim();
-    // Require at least a message OR an attachment
-    if (!trimmed && !attachment) return;
+
+    // Require a message or an attachment
+    if (!trimmed && !attachment) {
+      textareaRef.current?.focus();
+      return;
+    }
 
     onSendMessage(trimmed, attachment);
+
     setInput("");
     setAttachment(null);
 
-    // Reset height
     if (textareaRef.current) {
       textareaRef.current.style.height = "44px";
     }
+
+    // Focus after React updates
+    setTimeout(() => {
+      if (!isLoading) {
+        textareaRef.current?.focus();
+      }
+    }, 0);
   };
 
   const handleKeyDown = (e) => {
@@ -107,9 +130,16 @@ export default function ChatInput({
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files are allowed.");
+      e.target.value = "";
+      return;
+    }
+
     setAttachment(file);
-    // Clear the input value so the same file can be re-selected after removal
     e.target.value = "";
   };
 
@@ -188,7 +218,7 @@ export default function ChatInput({
             <input
               ref={fileInputRef}
               type="file"
-              accept="*/*"
+              accept="image/*"
               onChange={handleFileChange}
               className="hidden"
               aria-label="Select file to attach"
@@ -210,12 +240,12 @@ export default function ChatInput({
           </div>
 
           {/* Textarea */}
-           <textarea
-             ref={textareaRef}
-             onPaste={handlePaste}
-             value={input}
-             onChange={(e) => setInput(e.target.value)}
-             onKeyDown={handleKeyDown}
+          <textarea
+            ref={textareaRef}
+            onPaste={handlePaste}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             disabled={isLoading}
             placeholder={
               attachment

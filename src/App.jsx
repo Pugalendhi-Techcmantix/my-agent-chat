@@ -9,7 +9,7 @@ import SetupModal from "./components/SetupModal";
 import { useChat } from "./hooks/useChat";
 import { useTheme } from "./hooks/useTheme";
 import { isWebhookConfigured } from "./services/n8nService";
-import { AlertTriangle, ArrowRight } from "lucide-react";
+import { AlertTriangle, ArrowRight, ArrowDown } from "lucide-react";
 
 export default function App() {
   const { isDark, toggleTheme } = useTheme();
@@ -24,6 +24,10 @@ export default function App() {
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
   const [setupModalOpen, setSetupModalOpen] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const mainScrollRef = useRef(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const isNearBottomRef = useRef(true);
 
   const {
     conversations,
@@ -48,6 +52,33 @@ export default function App() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, isLoading]);
+
+  const scrollToBottom = useCallback((behavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior,
+      block: "end",
+    });
+  }, []);
+
+  const handleMessagesScroll = useCallback(() => {
+    const container = mainScrollRef.current;
+
+    if (!container) return;
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+
+    const isNearBottom = distanceFromBottom < 120;
+
+    isNearBottomRef.current = isNearBottom;
+    setShowScrollButton(!isNearBottom);
+  }, []);
+
+  useEffect(() => {
+    if (isNearBottomRef.current) {
+      scrollToBottom("smooth");
+    }
+  }, [messages.length, isLoading, scrollToBottom]);
 
   const toggleSidebar = useCallback(() => {
     if (typeof window !== "undefined" && window.innerWidth < 768) {
@@ -140,9 +171,16 @@ export default function App() {
         )}
 
         {/* Scrollable Conversation Container */}
-        <main className="flex-1 overflow-y-auto flex flex-col">
+        {/* <main className="flex-1 overflow-y-auto flex flex-col"> */}
+        <main
+          ref={mainScrollRef}
+          onScroll={handleMessagesScroll}
+          className="relative flex-1 overflow-y-auto flex flex-col"
+        >
           {!hasMessages ? (
-            <WelcomeScreen onSelectPrompt={(prompt) => sendMessage(prompt, null)} />
+            <WelcomeScreen
+              onSelectPrompt={(prompt) => sendMessage(prompt, null)}
+            />
           ) : (
             <div className="py-4 space-y-2">
               {messages.map((message) => (
@@ -158,6 +196,29 @@ export default function App() {
               {/* Anchor for auto-scroll */}
               <div ref={messagesEndRef} />
             </div>
+          )}
+
+          {!isLoading && showScrollButton && hasMessages && (
+            <button
+              type="button"
+              onClick={() => scrollToBottom("smooth")}
+              aria-label="Scroll to latest message"
+              title="Scroll to latest message"
+              className="
+  fixed bottom-30 left-[calc(50%+110px)] -translate-x-1/2 z-30
+  flex h-7 w-7 items-center justify-center
+  rounded-full border border-slate-200
+  bg-white text-slate-700 shadow-lg
+  transition-all duration-200
+  hover:scale-105 hover:bg-slate-50
+  dark:border-slate-600 dark:bg-[#303030]
+  dark:text-slate-100 dark:hover:bg-[#3a3a3a]
+  focus:outline-none focus:ring-2
+  focus:ring-indigo-500 cursor-pointer
+"
+            >
+              <ArrowDown size={18} strokeWidth={2.2} />
+            </button>
           )}
         </main>
 
