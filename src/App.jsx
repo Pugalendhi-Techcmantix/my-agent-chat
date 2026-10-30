@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
+import DocsView from "./components/DocsView";
 import WelcomeScreen from "./components/WelcomeScreen";
 import ChatMessage from "./components/ChatMessage";
 import ChatInput from "./components/ChatInput";
@@ -13,6 +14,11 @@ import { AlertTriangle, ArrowRight, ArrowDown } from "lucide-react";
 
 export default function App() {
   const { isDark, toggleTheme } = useTheme();
+
+  // State to control Docs side panel visibility
+  const [showDocs, setShowDocs] = useState(false);
+  const openDocs = () => setShowDocs(true);
+  const closeDocs = () => setShowDocs(false);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
@@ -140,6 +146,7 @@ export default function App() {
           onOpenSetup={() => setSetupModalOpen(true)}
           isDark={isDark}
           onToggleTheme={toggleTheme}
+          onShowDocs={openDocs}
         />
 
         {/* Warning notification banner if webhook URL is missing */}
@@ -221,6 +228,9 @@ export default function App() {
             </button>
           )}
         </main>
+
+        {/* Docs side panel (slides in from right) */}
+        {showDocs && <DocsView onClose={closeDocs} />}
 
         {/* Fixed Message Composer at Bottom */}
         <footer className="shrink-0 bg-linear-to-t from-white via-white/95 to-transparent dark:from-[#212121] dark:via-[#212121]/95 dark:to-transparent pt-2 transition-colors duration-200">

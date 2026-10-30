@@ -1,4 +1,4 @@
-import { Plus, Trash2, Settings2, PanelLeftClose, PanelLeftOpen, Sun, Moon } from 'lucide-react';
+import { Plus, Trash2, Settings2, PanelLeftClose, PanelLeftOpen, Sun, Moon, BookOpen } from 'lucide-react';
 import { isWebhookConfigured } from '../services/n8nService';
 
 export default function Header({
@@ -11,6 +11,7 @@ export default function Header({
   onOpenSetup,
   isDark,
   onToggleTheme,
+  onShowDocs,
 }) {
   const configured = isWebhookConfigured();
 
@@ -100,6 +101,17 @@ export default function Header({
         >
           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
           <span className="hidden sm:inline">New Chat</span>
+        </button>
+
+        {/* Docs Button */}
+        <button
+          onClick={onShowDocs}
+          type="button"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-[#383838] bg-white dark:bg-[#2a2a2a] text-slate-600 dark:text-amber-400 hover:bg-slate-50 dark:hover:bg-[#333333] transition-colors cursor-pointer"
+          title="View Documentation"
+          aria-label="View Documentation"
+        >
+          <BookOpen className="w-4 h-4" />
         </button>
       </div>
     </header>
